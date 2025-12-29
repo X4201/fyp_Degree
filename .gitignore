@@ -205,3 +205,10 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+mental_health_workplace_survey.csv
+social_media_vs_productivity.csv
+synthetic-employee-dataset.json
+catboost_info/catboost_training.json
+catboost_info/learn_error.tsv
+catboost_info/time_left.tsv
+catboost_info/learn/events.out.tfevents
