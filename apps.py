@@ -4,15 +4,37 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+import joblib
+
 
 
 def predict_burnout(data):
     # Replace with your trained classifier
     return np.random.choice(["Low", "Medium", "High"])
 
+# Load the saved assets at the top of your script
+# These were fit on your 22,108 training observations
+reg_model = joblib.load('best_productivity_model.pkl')
+imputer = joblib.load('imputer.pkl')
+scaler = joblib.load('scaler.pkl')
+model_cols = joblib.load('model_columns.pkl')
+
 def predict_productivity(data):
-    # Replace with your trained regression model
-    return round(np.random.uniform(2, 7), 2)
+    # 1. Replicate the dummy variable creation
+    data_encoded = pd.get_dummies(data)
+    
+    # 2. Reindex to match the EXACT column order of training (X_train)
+    # This adds missing columns as 0 and removes any extras
+    data_final = data_encoded.reindex(columns=model_cols, fill_value=0)
+    
+    # 3. Apply the Imputer and Scaler
+    data_imputed = imputer.transform(data_final)
+    data_scaled = scaler.transform(data_imputed)
+    
+    # 4. Predict using the Tuned CatBoost model
+    prediction = reg_model.predict(data_scaled)
+    
+    return round(float(prediction[0]), 2)
 
 def assign_cluster(data):
     # Replace with your clustering model
@@ -88,7 +110,6 @@ elif page == "Prediction":
             "gender": [gender],
             "daily_social_media_time": [daily_social_media_time],
             "work_hours_per_day": [work_hours],
-            "actual_productivity_score": [actual_productivity_score],
             "stress_level": [stress_level],
             "sleep_hours": [sleep_hours],
             "breaks_during_work": [breaks_during_work],
